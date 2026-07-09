@@ -1,0 +1,8 @@
+---
+- name: Harden server security baseline
+  hosts: cloudserver
+  become: true
+  roles:
+    - users
+    - ssh_hardening
+    - firewall
