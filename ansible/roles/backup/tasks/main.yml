@@ -1,0 +1,16 @@
+---
+- name: Create backup base directory
+  file:
+    path: /var/backups/cloudserver
+    state: directory
+    owner: root
+    group: root
+    mode: '0750'
+
+- name: Create Nextcloud-specific backup subdirectory
+  file:
+    path: /var/backups/cloudserver/nextcloud
+    state: directory
+    owner: root
+    group: root
+    mode: '0750'

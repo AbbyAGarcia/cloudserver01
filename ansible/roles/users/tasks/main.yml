@@ -1,0 +1,28 @@
+---
+- name: Create admin user
+  user:
+    name: "{{ admin_user }}"
+    shell: /bin/bash
+    groups: sudo
+    append: true
+    state: present
+
+- name: Create .ssh directory for admin user
+  file:
+    path: "/home/{{ admin_user }}/.ssh"
+    state: directory
+    owner: "{{ admin_user }}"
+    group: "{{ admin_user }}"
+    mode: '0700'
+
+- name: Deploy authorized SSH key
+  authorized_key:
+    user: "{{ admin_user }}"
+    key: "{{ lookup('file', ssh_public_key_path) }}"
+    state: present
+
+- name: Grant passwordless sudo to admin user
+  copy:
+    dest: "/etc/sudoers.d/{{ admin_user }}"
+    content: "{{ admin_user }} ALL=(ALL) NOPASSWD:ALL\n"
+    validate: 'visudo -cf %s'

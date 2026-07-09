@@ -1,0 +1,4 @@
+admin_user: garcia
+ssh_public_key_path: ~/.ssh/id_ed25519.pub
+nextcloud_db_root_password: "123"
+nextcloud_db_password: "1234"

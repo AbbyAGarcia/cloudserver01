@@ -1,0 +1,22 @@
+---
+- name: Install nginx
+  apt:
+    name: nginx
+    state: present
+
+- name: Deploy landing page
+  copy:
+    dest: /var/www/html/index.html
+    content: |
+      <!DOCTYPE html>
+      <html>
+      <head><title>Personal Cloud Server</title></head>
+      <body><h1>cloudserver01 — Online</h1></body>
+      </html>
+    mode: '0644'
+
+- name: Ensure nginx is enabled and running
+  systemd:
+    name: nginx
+    enabled: true
+    state: started
