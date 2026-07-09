@@ -1,0 +1,30 @@
+---
+- name: Maintenance tasks
+  hosts: cloudserver
+  become: true
+  tasks:
+    - name: Configure unattended upgrades
+      apt:
+        name: unattended-upgrades
+        state: present
+
+    - name: Enable automatic security updates
+      copy:
+        dest: /etc/apt/apt.conf.d/20auto-upgrades
+        content: |
+          APT::Periodic::Update-Package-Lists "1";
+          APT::Periodic::Unattended-Upgrade "1";
+
+    - name: Ensure backup directory exists
+      file:
+        path: /var/backups/nextcloud
+        state: directory
+        owner: root
+        mode: '0750'
+
+    - name: Schedule nightly backup cron job
+      cron:
+        name: "Nextcloud data backup"
+        minute: "0"
+        hour: "2"
+        job: "tar -czf /var/backups/nextcloud/backup-$(date +\\%F).tar.gz /opt/nextcloud/data"
