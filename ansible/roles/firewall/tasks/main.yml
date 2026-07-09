@@ -1,8 +1,6 @@
----
-- name: Reset UFW to defaults
-  community.general.ufw:
-    state: reset
 
+
+---
 - name: Deny all incoming by default
   community.general.ufw:
     direction: incoming

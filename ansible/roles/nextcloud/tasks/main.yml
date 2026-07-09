@@ -7,7 +7,7 @@
 
 - name: Ensure Docker Compose plugin is installed
   apt:
-    name: docker-compose-plugin
+    name: docker-compose-v2
     state: present
 
 - name: Create Nextcloud directory

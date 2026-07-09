@@ -1,0 +1,11 @@
+---
+- name: Deploy Nextcloud personal cloud service
+  hosts: cloudserver
+  become: true
+  roles:
+    - common
+    - firewall
+    - ssh_hardening
+    - webserver
+    - nextcloud
+    - backup

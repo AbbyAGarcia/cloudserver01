@@ -1,0 +1,7 @@
+---
+- name: Deploy web server
+  hosts: cloudserver
+  become: true
+  roles:
+    - common
+    - webserver
