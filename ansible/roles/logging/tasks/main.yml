@@ -1,0 +1,30 @@
+---
+- name: Configure log rotation for syslog
+  copy:
+    dest: /etc/logrotate.d/cloudserver-custom
+    content: |
+      /var/log/deployment.log /var/log/deployment-report.log {
+          weekly
+          rotate 4
+          compress
+          missingok
+          notifempty
+      }
+
+- name: Ensure rsyslog is installed and running
+  apt:
+    name: rsyslog
+    state: present
+
+- name: Enable rsyslog service
+  systemd:
+    name: rsyslog
+    enabled: true
+    state: started
+
+- name: Configure persistent journald logging
+  lineinfile:
+    path: /etc/systemd/journald.conf
+    regexp: '^#?Storage='
+    line: 'Storage=persistent'
+  notify: restart journald

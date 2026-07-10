@@ -1,0 +1,21 @@
+---
+- name: Download and install Netdata
+  shell: |
+    curl -Ss https://get.netdata.cloud/kickstart.sh > /tmp/netdata-kickstart.sh
+    sh /tmp/netdata-kickstart.sh --non-interactive --stable-channel
+  args:
+    creates: /usr/sbin/netdata
+
+- name: Ensure Netdata service is running
+  systemd:
+    name: netdata
+    enabled: true
+    state: started
+
+- name: Restrict Netdata dashboard to admin workstation only
+  community.general.ufw:
+    rule: allow
+    port: '19999'
+    proto: tcp
+    from_ip: "{{ 192.168.1.165 }}"
+
