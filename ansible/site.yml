@@ -9,3 +9,5 @@
     - webserver
     - nextcloud
     - backup
+    - logging
+    - monitoring

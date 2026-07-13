@@ -1,0 +1,6 @@
+---
+- name: Deploy observability stack
+  hosts: cloudserver
+  become: true
+  roles:
+    - observability

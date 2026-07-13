@@ -13,9 +13,7 @@
     state: started
 
 - name: Restrict Netdata dashboard to admin workstation only
-  community.general.ufw:
-    rule: allow
-    port: '19999'
-    proto: tcp
-    from_ip: "{{ 192.168.1.165 }}"
+  command: ufw allow from {{ admin_workstation_ip }} to any port 19999 proto tcp
+  register: ufw_netdata_result
+  changed_when: "'Skipping adding existing rule' not in ufw_netdata_result.stdout"
 

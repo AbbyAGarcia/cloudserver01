@@ -1,0 +1,68 @@
+---
+- name: Create monitoring directory
+  file:
+    path: /opt/monitoring
+    state: directory
+    mode: '0755'
+
+- name: Create textfile collector directory
+  file:
+    path: /opt/monitoring/textfile_collector
+    state: directory
+    mode: '0755'
+
+- name: Create Grafana datasource provisioning directory
+  file:
+    path: /opt/monitoring/provisioning/datasources
+    state: directory
+    mode: '0755'
+
+- name: Deploy Prometheus config
+  template:
+    src: prometheus.yml.j2
+    dest: /opt/monitoring/prometheus.yml
+
+- name: Deploy Grafana datasource provisioning
+  template:
+    src: grafana-datasource.yml.j2
+    dest: /opt/monitoring/provisioning/datasources/prometheus.yml
+
+- name: Deploy monitoring stack docker-compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/monitoring/docker-compose.yml
+
+- name: Deploy failed-login metric script
+  copy:
+    dest: /opt/monitoring/failed_logins.sh
+    mode: '0755'
+    content: |
+      #!/bin/bash
+      FAILED=$(grep "Failed password" /var/log/auth.log 2>/dev/null | wc -l)
+      ACCEPTED=$(grep "Accepted publickey" /var/log/auth.log 2>/dev/null | wc -l)
+      {
+        echo "ssh_failed_login_attempts_total $FAILED"
+        echo "ssh_accepted_login_attempts_total $ACCEPTED"
+      } > /opt/monitoring/textfile_collector/failed_logins.prom.tmp
+      mv /opt/monitoring/textfile_collector/failed_logins.prom.tmp /opt/monitoring/textfile_collector/failed_logins.prom
+
+- name: Schedule failed-login metric collection
+  cron:
+    name: "Collect failed SSH login metric"
+    minute: "*/5"
+    job: "/opt/monitoring/failed_logins.sh"
+
+- name: Start monitoring stack
+  community.docker.docker_compose_v2:
+    project_src: /opt/monitoring
+    state: present
+
+- name: Allow Grafana dashboard from admin workstation only
+  command: ufw allow from {{ admin_workstation_ip }} to any port 3000 proto tcp
+  register: ufw_grafana_result
+  changed_when: "'Skipping adding existing rule' not in ufw_grafana_result.stdout"
+
+- name: Allow Uptime Kuma from admin workstation only
+  command: ufw allow from {{ admin_workstation_ip }} to any port 3001 proto tcp
+  register: ufw_kuma_result
+  changed_when: "'Skipping adding existing rule' not in ufw_kuma_result.stdout"

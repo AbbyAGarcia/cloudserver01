@@ -3,3 +3,6 @@ ssh_public_key_path: ~/.ssh/id_ed25519.pub
 nextcloud_db_root_password: "123"
 nextcloud_db_password: "1234"
 admin_workstation_ip: 192.168.1.165
+grafana_admin_password: "123"
+grafana_smtp_user: "abby.adielle@gmail.com"
+grafana_smtp_password: "ecly vuyq pibb aoep"
